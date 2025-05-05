@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     };
 
     // Call LlamaIndex API to check for existing pipeline
-    const pipelineResponse = await fetch('https://api.cloud.llamaindex.ai/api/v1/pipelines?pipeline_name=Invoicer Index', {
+    const pipelineResponse = await fetch('https://api.cloud.llamaindex.ai/api/v1/pipelines?pipeline_name=FAQ Support Chatbot', {
       headers
     });
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          name: "Invoicer embedding",
+          name: "FAQ Support Chatbot Embedding",
           embedding_config: {
             type: "OPENAI_EMBEDDING",
             component: {
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         embedding_model_config_id: embeddingConfigId,
         data_sink_id: null,
-        name: "Invoicer Index",
+        name: "FAQ Support Chatbot",
         transform_config: { mode: "auto" }
       })
     });
@@ -118,4 +118,4 @@ export async function POST(req: NextRequest) {
       error: 'Internal server error during initialization'
     }, { status: 500 });
   }
-} 
+}

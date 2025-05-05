@@ -4,7 +4,7 @@ import { OpenAI } from '@llamaindex/openai';
 export async function GET(request: NextRequest) {
   const llm = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-    model: 'o3-mini',
+    model: 'gpt-4.1-mini',
   });
 
   try {

@@ -3,15 +3,17 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Login from '@/components/Login';
-import ContractUpload from '@/components/ContractUpload';
-import ContractsList from '@/components/ContractsList';
+import DocumentUpload from '@/components/DocumentUpload';
+import DocumentsList from '@/components/DocumentsList';
+import ChatInterface from '@/components/ChatInterface';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InvoicesProvider } from '@/context/InvoicesContext';
+import { ChatProvider } from '@/context/ChatContext';
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [initMessage, setInitMessage] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const initializeIndex = async () => {
     try {
@@ -32,7 +34,7 @@ export default function Home() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('index_id', data.index_id);
-        setInitMessage('Index initialized');
+        setInitMessage('Knowledge base initialized');
         setTimeout(() => setInitMessage(''), 3000);
       }
     } catch (err) {
@@ -61,18 +63,33 @@ export default function Home() {
     setIsLoggedIn(false);
   };
 
+  const toggleAdminMode = () => {
+    setIsAdmin(!isAdmin);
+  };
+
   return (
     <>
       <div className="fixed left-0 top-0 h-screen w-64 bg-gray-50 p-4 flex flex-col items-center">
         <div className="w-32 h-32 relative mb-4">
           <Image
             src="/logo.png"
-            alt="Invoice Reconciler Logo"
+            alt="FAQ Support Chatbot Logo"
             fill
             className="object-contain"
           />
         </div>
-        <h1 className="text-2xl font-bold text-center">Invoice Reconciler</h1>
+        <h1 className="text-2xl font-bold text-center">FAQ Support Chatbot</h1>
+        
+        {isLoggedIn && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={toggleAdminMode}
+            className="mt-4"
+          >
+            {isAdmin ? "Exit Admin Mode" : "Admin Mode"}
+          </Button>
+        )}
       </div>
 
       {isLoggedIn ? (
@@ -93,11 +110,17 @@ export default function Home() {
               </Alert>
             </div>
           )}
-          <div className="ml-64 max-w-2xl mx-auto px-4 pt-4">
-            <InvoicesProvider>
-              <ContractUpload className="mb-6" />
-              <ContractsList />
-            </InvoicesProvider>
+          <div className="ml-64 max-w-4xl mx-auto px-4 pt-4">
+            <ChatProvider>
+              {isAdmin ? (
+                <>
+                  <DocumentUpload className="mb-6" />
+                  <DocumentsList />
+                </>
+              ) : (
+                <ChatInterface />
+              )}
+            </ChatProvider>
           </div>
         </>
       ) : (
