@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Invoice Reconciler",
+  title: "TechNova FAQ Support Chatbot",
   description: "Another great LlamaIndex demo",
 };
 

@@ -94,11 +94,7 @@ export async function POST(req: NextRequest) {
 
     const result = await pipelineResponse.json();
     console.log('Pipeline response:', result);
-    return NextResponse.json({
-      success: true,
-      message: `Successfully uploaded ${files.length} document(s)`,
-      fileIds
-    });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error processing upload:', error);
     return NextResponse.json({ 

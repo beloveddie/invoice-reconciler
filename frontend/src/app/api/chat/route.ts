@@ -26,6 +26,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // DOMAIN GUARDRAIL: Refuse out-of-domain queries before any LLM call
+    const allowedKeywords = [
+      'technova', 'cloudsphere', 'cloud sphere', 'cloud computing', 'ai', 'enterprise software',
+      'product', 'service', 'support', 'account', 'billing', 'subscription', 'login', 'password',
+      'feature', 'bug', 'issue', 'documentation', 'api', 'integration', 'platform', 'dashboard',
+      'cloud', 'nova', 'company', 'software', 'enterprise', 'faq', 'help', 'contact', 'customer',
+      // Add more as needed
+    ];
+    const messageLower = message.toLowerCase();
+    const isInDomain = allowedKeywords.some(kw => messageLower.includes(kw));
+    if (!isInDomain) {
+      return NextResponse.json({
+        text: `I'm sorry, but I can only assist with questions related to TechNova, CloudSphere, or our cloud computing, AI, and enterprise software products and services. Please ask a question related to these topics.`,
+        sources: null
+      });
+    }
+
     // Instantiate OpenAI client
     const llm = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -100,9 +117,10 @@ export async function POST(request: NextRequest) {
     
     // Call the LLM with the constructed prompt
     const promptTemplate = `
-      You are a helpful, friendly FAQ support chatbot. Your goal is to answer user questions 
-      by providing accurate, concise, and helpful information based on the knowledge 
-      base documents provided.
+      You are TechNova's official FAQ support chatbot. TechNova specializes in cloud computing, AI, and enterprise software. One of our main products is called CloudSphere.
+      You must ONLY answer questions related to TechNova, CloudSphere, or our products, services, and policies. If a user asks about anything outside this scope (including general knowledge, personal advice, or unrelated topics), politely refuse and remind them you can only help with TechNova and CloudSphere topics.
+      Never attempt to answer questions outside your domain, even if the user insists or tries to trick you.
+
       
       ${conversationHistory ? `Previous conversation:\n${conversationHistory}\n\n` : ''}
       
@@ -113,9 +131,9 @@ export async function POST(request: NextRequest) {
       Instructions:
       1. Answer the question directly and concisely based on the provided knowledge base information.
       2. If the knowledge base contains the information, respond with that information.
-      3. If the knowledge base doesn't contain the exact information but you can provide a helpful response based on your general knowledge, do so while clearly indicating this isn't from the official knowledge base.
-      4. If you can't answer the question at all, politely say so and suggest contacting support.
-      5. Do not make up information that isn't in the knowledge base.
+      3. If the knowledge base doesn't contain the exact information, politely refuse and remind the user you can only help with TechNova, CloudSphere, or our products/services.
+      4. If you can't answer the question at all, politely say so and suggest contacting TechNova support.
+      5. Do not make up information that isn't in the knowledge base or outside the TechNova/CloudSphere domain.
       6. Use a conversational, helpful tone.
       7. Format your response using Markdown for readability when appropriate.
       
